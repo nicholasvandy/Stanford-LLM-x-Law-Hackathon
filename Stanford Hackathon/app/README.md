@@ -1,16 +1,28 @@
-# React + Vite
+# Contract Negotiation Arena
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This app now runs the negotiation counterparty through a local OpenAI-backed API instead of a browser-side Anthropic call. The React client stays in Vite, and `server.mjs` holds the OpenAI key server-side and exposes `/api/negotiate`.
 
-Currently, two official plugins are available:
+## Local setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Install dependencies with `npm install`
+2. Create `C:\Users\ayush\Desktop\Hackathons\Startup Legal Tech\Stanford-LLM-x-Law-Hackathon\Stanford Hackathon\app\.env.local` from `.env.example`
+3. Add your key as `OPENAI_API_KEY=...`
+4. Optional model override: `OPENAI_MODEL=gpt-5-mini`
+5. Start the full stack with `npm run dev`
 
-## React Compiler
+That starts:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- the Vite client on port `5173`
+- the local negotiation API on port `5050`
 
-## Expanding the ESLint configuration
+## Previewing a production build
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Run `npm run build`
+2. Run `npm run preview`
+
+The preview server serves the built `dist` bundle and keeps `/api/negotiate` available on the same origin.
+
+## Notes
+
+- If `OPENAI_API_KEY` is missing, the UI now shows a setup error banner instead of silently fabricating a vendor rejection.
+- The default model is `gpt-5-mini`; set `OPENAI_MODEL` if you want to swap to another OpenAI Responses-compatible model.

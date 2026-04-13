@@ -170,23 +170,34 @@ function maxPossible(vals, pool, terms) {
   return terms.reduce((score, termKey) => score + (vals?.[termKey] || 0) * (pool?.[termKey] || 0), 0);
 }
 
-async function callAI(systemPrompt, userMessage) {
+async function callAI(systemPrompt, userMessage, pool, terms) {
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("/api/negotiate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
+        systemPrompt,
+        userMessage,
+        pool,
+        terms,
       }),
     });
-    const data = await response.json();
-    return data.content?.[0]?.text || "";
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return {
+        data: null,
+        error: data?.error || "The OpenAI negotiation service returned an error.",
+      };
+    }
+
+    return { data, error: null };
   } catch (error) {
     console.error("API error:", error);
-    return null;
+    return {
+      data: null,
+      error: "The OpenAI negotiation service is unreachable. Start the local API server and try again.",
+    };
   }
 }
 
@@ -206,13 +217,7 @@ RULES:
 - You can propose, accept, or reject.
 - No deal gives both sides -0.5.
 - Any deal beats no deal.
-
-RESPONSE FORMAT:
-\`\`\`json
-{"action":"propose|accept|reject","offer":{"my_share":{${terms.map((termKey) => `"${termKey}": N`).join(",")}},"their_share":{${terms.map((termKey) => `"${termKey}": N`).join(",")}}}}
-\`\`\`
-MESSAGE: [Your message here]
-
+When you propose, allocate every unit across the full term set.
 Keep the message under 150 words and use realistic legal or business language.`;
 }
 
@@ -237,31 +242,35 @@ function buildAITurnPrompt(history, roundNum) {
   return prompt;
 }
 
-function parseAIResponse(text, pool, terms) {
-  try {
-    const jsonBlock = text.match(/```json\s*([\s\S]*?)\s*```/);
-    const parsed = jsonBlock ? JSON.parse(jsonBlock[1]) : JSON.parse((text.match(/\{[\s\S]*"action"[\s\S]*\}/) || [])[0] || "null");
-    if (!parsed) {
-      return null;
-    }
-    const messageMatch = text.match(/MESSAGE:\s*([\s\S]*?)$/m);
-    const message = messageMatch ? messageMatch[1].trim() : text.replace(/```json[\s\S]*?```/, "").trim().substring(0, 300);
-    let offer = null;
-    if (parsed.action === "propose" && parsed.offer) {
-      offer = { my_share: {}, their_share: {} };
-      terms.forEach((termKey) => {
-        offer.my_share[termKey] = parseInt(parsed.offer.my_share?.[termKey] ?? 0, 10);
-        offer.their_share[termKey] = parseInt(parsed.offer.their_share?.[termKey] ?? 0, 10);
-      });
-      if (!validateOffer(offer, pool, terms)) {
-        return { action: "reject", offer: null, message: message || "Let me reconsider that structure." };
-      }
-    }
-    return { action: parsed.action || "reject", offer, message: message || "..." };
-  } catch (error) {
-    console.error("Parse error:", error);
+function normalizeAIResponse(payload, pool, terms) {
+  if (!payload || typeof payload !== "object") {
     return null;
   }
+
+  const action = ["propose", "accept", "reject"].includes(payload.action) ? payload.action : "reject";
+  const message = typeof payload.message === "string" && payload.message.trim()
+    ? payload.message.trim().substring(0, 300)
+    : "I need more time to review this structure.";
+
+  if (action !== "propose") {
+    return { action, offer: null, message };
+  }
+
+  const offer = { my_share: {}, their_share: {} };
+  terms.forEach((termKey) => {
+    offer.my_share[termKey] = parseInt(payload.offer?.my_share?.[termKey] ?? 0, 10);
+    offer.their_share[termKey] = parseInt(payload.offer?.their_share?.[termKey] ?? 0, 10);
+  });
+
+  if (!validateOffer(offer, pool, terms)) {
+    return {
+      action: "reject",
+      offer: null,
+      message: "I need to revise the allocation before I can respond.",
+    };
+  }
+
+  return { action, offer, message };
 }
 
 const FONT_URL = "https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap";
@@ -541,6 +550,7 @@ export default function App() {
   const [proposal, setProposal] = useState({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [systemNotice, setSystemNotice] = useState("");
   const [result, setResult] = useState(null);
   const [jurisdiction, setJurisdiction] = useState(PLAYBOOK_METADATA.default_jurisdiction || PLAYBOOK_METADATA.defaultJurisdiction);
   const [isNarrow, setIsNarrow] = useState(() => (typeof window !== "undefined" ? window.innerWidth < 980 : false));
@@ -578,6 +588,7 @@ export default function App() {
     setProposal(initialProposal);
     setMessage("");
     setResult(null);
+    setSystemNotice("");
     setGameState({
       seed,
       pool: generated.pool,
@@ -600,6 +611,7 @@ export default function App() {
         return;
       }
 
+      setSystemNotice("");
       setLoading(true);
       const { pool, valsUser, valsAI, history, round, lastProposal, lastProposer } = gameState;
       const terms = scenario.terms;
@@ -668,11 +680,23 @@ export default function App() {
       }
 
       const aiPromptHistory = nextHistory.map((turn) => ({ ...turn, player: turn.player === scenario.role ? scenario.role : scenario.counterparty }));
-      const aiText = await callAI(buildAISystemPrompt(scenario, pool, valsAI, terms), buildAITurnPrompt(aiPromptHistory, round));
-      let aiResponse = aiText ? parseAIResponse(aiText, pool, terms) : null;
+      const aiResult = await callAI(
+        buildAISystemPrompt(scenario, pool, valsAI, terms),
+        buildAITurnPrompt(aiPromptHistory, round),
+        pool,
+        terms,
+      );
+      if (aiResult.error || !aiResult.data) {
+        setSystemNotice(aiResult.error || "The OpenAI negotiation service did not return a usable response.");
+        setLoading(false);
+        return;
+      }
+
+      let aiResponse = normalizeAIResponse(aiResult.data, pool, terms);
       if (!aiResponse) {
         aiResponse = { action: "reject", offer: null, message: "I need more time to consider this structure." };
       }
+      setSystemNotice("");
       if (aiResponse.action === "accept" && (!currentLastProposal || currentLastProposer !== "User")) {
         aiResponse = { action: "reject", offer: null, message: aiResponse.message || "I cannot accept that yet." };
       }
@@ -1001,6 +1025,16 @@ export default function App() {
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <div style={{ flex: 1, padding: 22, overflowY: "auto" }}>
+          {systemNotice ? (
+            <div style={{ background: `${COLORS.redDim}66`, border: `1px solid ${COLORS.redDim}`, borderRadius: 14, padding: 14, maxWidth: 860, marginBottom: 16 }}>
+              <div style={{ fontFamily: "Space Mono, monospace", fontSize: 10, color: COLORS.red, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6 }}>
+                OpenAI service issue
+              </div>
+              <div style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: COLORS.text, lineHeight: 1.6 }}>
+                {systemNotice}
+              </div>
+            </div>
+          ) : null}
           {history.length === 0 ? (
             <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 18, padding: 24, maxWidth: 860, marginBottom: 20 }}>
               <div style={{ fontFamily: "Space Mono, monospace", fontSize: 10, color: COLORS.accent, letterSpacing: 2, textTransform: "uppercase", marginBottom: 10 }}>Opening frame</div>
