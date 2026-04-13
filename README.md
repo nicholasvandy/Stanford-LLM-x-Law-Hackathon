@@ -7,24 +7,24 @@ Get a forensic debrief on exactly where you left value on the table.
 
 <br>
 
-![Stanford CodeX](https://img.shields.io/badge/Stanford_CodeX-LLM_%C3%97_Law_Hackathon_%236-8C1515?style=for-the-badge)
-![Harvey Challenge](https://img.shields.io/badge/Harvey_Challenge-Entry-111111?style=for-the-badge)
-![MIT](https://img.shields.io/badge/License-MIT-3B6D11?style=for-the-badge)
-
-<br>
-
----
-
-### The negotiation gap
-
-| | |
-|:---:|:---:|:---:|
-| **`2×`** | **`365×`** | **`0`** |
-| avg times a non-lawyer negotiates a major contract | times the counterparty attorney does the same | tools to practice before you sit at the table |
-
----
+<svg width="760" height="140" viewBox="0 0 760 140" xmlns="http://www.w3.org/2000/svg">
+  <rect width="760" height="140" rx="8" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+  <line x1="253" y1="20" x2="253" y2="120" stroke="#d0d7de" stroke-width="1"/>
+  <line x1="506" y1="20" x2="506" y2="120" stroke="#d0d7de" stroke-width="1"/>
+  <text x="126" y="70" text-anchor="middle" fill="#0969da" font-size="38" font-weight="700" font-family="ui-monospace,SFMono-Regular,monospace">2×</text>
+  <text x="126" y="94" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">avg times a non-lawyer</text>
+  <text x="126" y="110" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">negotiates a major contract</text>
+  <text x="380" y="70" text-anchor="middle" fill="#cf222e" font-size="38" font-weight="700" font-family="ui-monospace,SFMono-Regular,monospace">365×</text>
+  <text x="380" y="94" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">times the counterparty attorney</text>
+  <text x="380" y="110" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">does the same</text>
+  <text x="633" y="70" text-anchor="middle" fill="#1a7f37" font-size="38" font-weight="700" font-family="ui-monospace,SFMono-Regular,monospace">0</text>
+  <text x="633" y="94" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">tools to practice before</text>
+  <text x="633" y="110" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">you sit at the table</text>
+</svg>
 
 </div>
+
+<br>
 
 Most people negotiate contracts a handful of times in their lives. The person across the table does it every day. That asymmetry is expensive, and until now there has been no way to practice before you sit down.
 
@@ -103,19 +103,19 @@ After the deal closes, the debrief surfaces:
 | **Optimal strategy** | The single most valuable trade available in that scenario |
 | **Final score** | Your percentage of theoretical maximum |
 
-> Valuation ranges benchmarked against NVCA model legal documents, Bonterms, and SEC EDGAR public filings.
-
-**Example debrief output:**
+**Example output:**
 
 ```
 Score: 73% of theoretical maximum
 
-  Liability Cap      you: 9pts/unit   them: 3pts/unit   → you got 4/6 units   ✓ good
-  Termination        you: 2pts/unit   them: 11pts/unit  → you got 5/8 units   ⚠ gave too much
-  SLA Uptime         you: 6pts/unit   them: 5pts/unit   → you got 3/5 units   ✓ fair
+  Liability Cap    you: 9pts/unit   them: 3pts/unit   → you got 4/6 units   ✓
+  Termination      you: 2pts/unit   them: 11pts/unit  → you got 5/8 units   ⚠ gave too much
+  SLA Uptime       you: 6pts/unit   them: 5pts/unit   → you got 3/5 units   ✓
 
-  Optimal trade missed: concede termination notice, take liability cap → +18pts
+  Optimal trade missed: concede termination notice, take liability cap  →  +18 pts
 ```
+
+> Valuation ranges benchmarked against NVCA model legal documents, Bonterms, and SEC EDGAR public filings.
 
 <br>
 
