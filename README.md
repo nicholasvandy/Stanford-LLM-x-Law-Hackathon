@@ -7,20 +7,7 @@ Get a forensic debrief on exactly where you left value on the table.
 
 <br>
 
-<svg width="760" height="140" viewBox="0 0 760 140" xmlns="http://www.w3.org/2000/svg">
-  <rect width="760" height="140" rx="8" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
-  <line x1="253" y1="20" x2="253" y2="120" stroke="#d0d7de" stroke-width="1"/>
-  <line x1="506" y1="20" x2="506" y2="120" stroke="#d0d7de" stroke-width="1"/>
-  <text x="126" y="70" text-anchor="middle" fill="#0969da" font-size="38" font-weight="700" font-family="ui-monospace,SFMono-Regular,monospace">2×</text>
-  <text x="126" y="94" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">avg times a non-lawyer</text>
-  <text x="126" y="110" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">negotiates a major contract</text>
-  <text x="380" y="70" text-anchor="middle" fill="#cf222e" font-size="38" font-weight="700" font-family="ui-monospace,SFMono-Regular,monospace">365×</text>
-  <text x="380" y="94" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">times the counterparty attorney</text>
-  <text x="380" y="110" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">does the same</text>
-  <text x="633" y="70" text-anchor="middle" fill="#1a7f37" font-size="38" font-weight="700" font-family="ui-monospace,SFMono-Regular,monospace">0</text>
-  <text x="633" y="94" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">tools to practice before</text>
-  <text x="633" y="110" text-anchor="middle" fill="#57606a" font-size="12" font-family="-apple-system,BlinkMacSystemFont,sans-serif">you sit at the table</text>
-</svg>
+<img src="assets/stats.svg" width="100%" alt="The negotiation gap"/>
 
 </div>
 
