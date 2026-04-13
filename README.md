@@ -2,31 +2,29 @@
 
 # Contract Negotiation Arena
 
-**AI-powered contract negotiation sparring partner.**  
-Negotiate real legal agreements against an AI counterparty with hidden preferences, then get a forensic debrief on where you left value on the table.
+**Negotiate real legal agreements against an AI counterparty with hidden preferences.**  
+Get a forensic debrief on exactly where you left value on the table.
 
 <br>
 
-[![Built at Stanford](https://img.shields.io/badge/Stanford_CodeX-LLM_%C3%97_Law_Hackathon_%236-8C1515?style=flat-square)](https://law.stanford.edu/codex-the-stanford-center-for-legal-informatics/)
-[![Harvey Challenge](https://img.shields.io/badge/Harvey-Challenge_Entry-000000?style=flat-square)](https://www.harvey.ai/)
-[![Powered by Claude](https://img.shields.io/badge/Powered_by-Anthropic_Claude-D97706?style=flat-square)](https://www.anthropic.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
+![Stanford CodeX](https://img.shields.io/badge/Stanford_CodeX-LLM_%C3%97_Law_Hackathon_%236-8C1515?style=for-the-badge)
+![Harvey Challenge](https://img.shields.io/badge/Harvey_Challenge-Entry-111111?style=for-the-badge)
+![MIT](https://img.shields.io/badge/License-MIT-3B6D11?style=for-the-badge)
+
+<br>
+
+---
+
+### The negotiation gap
+
+| | |
+|:---:|:---:|:---:|
+| **`2×`** | **`365×`** | **`0`** |
+| avg times a non-lawyer negotiates a major contract | times the counterparty attorney does the same | tools to practice before you sit at the table |
+
+---
 
 </div>
-
-<br>
-
-## Overview
-
-<table>
-<tr>
-<td align="center" width="33%"><h2>2×</h2><sub>avg times a non-lawyer<br>negotiates a major contract</sub></td>
-<td align="center" width="33%"><h2>365×</h2><sub>times the counterparty<br>attorney does the same</sub></td>
-<td align="center" width="33%"><h2>0</h2><sub>tools to practice before<br>you sit at the table</sub></td>
-</tr>
-</table>
-
-<br>
 
 Most people negotiate contracts a handful of times in their lives. The person across the table does it every day. That asymmetry is expensive, and until now there has been no way to practice before you sit down.
 
@@ -42,7 +40,6 @@ Contract Negotiation Arena puts you in a live negotiation against an AI counterp
 - [Scoring and Debrief](#scoring-and-debrief)
 - [Setup](#setup)
 - [Background](#background)
-- [License](#license)
 
 <br>
 
@@ -64,7 +61,7 @@ Contract Negotiation Arena puts you in a live negotiation against an AI counterp
     See where you won, where you got bluffed, and what the optimal trade was
 ```
 
-> **The key constraint:** your score is completely hidden while you negotiate. No feedback, no hints. Because that is how real negotiation works.
+> **Key rule:** your score is completely hidden while you negotiate. No feedback, no hints. Because that is how real negotiation works.
 
 <br>
 
@@ -97,27 +94,28 @@ The core skill: trade what you value less for what the other side values more.
 score = points captured / theoretical maximum
 ```
 
-<br>
-
-<table>
-<tr>
-<td align="center" width="25%"><strong>73%</strong><br><sub>of theoretical max captured<br>(example round)</sub></td>
-<td align="center" width="25%"><strong>What you valued most</strong><br><sub>Liability Cap<br>9 pts / unit</sub></td>
-<td align="center" width="25%"><strong>What they valued most</strong><br><sub>Termination Notice<br>11 pts / unit</sub></td>
-<td align="center" width="25%"><strong>The trade you missed</strong><br><sub>Give notice, take cap<br>+18 pts left on the table</sub></td>
-</tr>
-</table>
-
-<br>
-
 After the deal closes, the debrief surfaces:
 
-- **Per-term breakdown** — your valuation vs. the AI's, and how the split compared
-- **Missed trades** — terms where you conceded despite valuing them more than the AI did
-- **Optimal strategy** — the single most valuable trade available in that scenario
-- **Final score** — your percentage of theoretical maximum
+| | |
+|---|---|
+| **Per-term breakdown** | Your valuation vs. the AI's, and how the split compared |
+| **Missed trades** | Terms where you conceded despite valuing them more than the AI did |
+| **Optimal strategy** | The single most valuable trade available in that scenario |
+| **Final score** | Your percentage of theoretical maximum |
 
 > Valuation ranges benchmarked against NVCA model legal documents, Bonterms, and SEC EDGAR public filings.
+
+**Example debrief output:**
+
+```
+Score: 73% of theoretical maximum
+
+  Liability Cap      you: 9pts/unit   them: 3pts/unit   → you got 4/6 units   ✓ good
+  Termination        you: 2pts/unit   them: 11pts/unit  → you got 5/8 units   ⚠ gave too much
+  SLA Uptime         you: 6pts/unit   them: 5pts/unit   → you got 3/5 units   ✓ fair
+
+  Optimal trade missed: concede termination notice, take liability cap → +18pts
+```
 
 <br>
 
