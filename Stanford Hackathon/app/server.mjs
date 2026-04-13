@@ -152,7 +152,7 @@ function buildNegotiationSchema(terms, pool) {
         maxLength: 300,
       },
       offer: {
-        oneOf: [
+        anyOf: [
           { type: "null" },
           {
             type: "object",
@@ -280,12 +280,21 @@ async function requestNegotiationDecision({ systemPrompt, userMessage, pool, ter
   });
 
   const requestId = response.headers.get("x-request-id");
-  const data = await response.json().catch(() => null);
+  const rawResponse = await response.text();
+  let data = null;
+
+  if (rawResponse) {
+    try {
+      data = JSON.parse(rawResponse);
+    } catch {
+      data = null;
+    }
+  }
 
   if (!response.ok) {
     throw new HttpError(
       response.status,
-      data?.error?.message || "OpenAI request failed.",
+      data?.error?.message || rawResponse || `OpenAI request failed with status ${response.status}.`,
       requestId ? { requestId } : undefined,
     );
   }
