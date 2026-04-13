@@ -1,0 +1,357 @@
+{
+  "playbook_metadata": {
+    "playbook_id": "contract-negotiation-v1",
+    "name": "Commercial Contract Negotiation Playbook",
+    "version": "1.0.0",
+    "created_date": "2026-04-12",
+    "contract_types": ["SaaS", "Services", "Licensing", "NDA", "MSA"],
+    "default_jurisdiction": "US-General",
+    "supported_jurisdictions": ["US-General", "US-NY", "US-CA", "US-DE", "US-TX", "US-IL", "US-PA", "US-CO", "US-NJ"]
+  },
+  "scoring_config": {
+    "standard_match_score": 100,
+    "deviation_scores": [90, 80, 70, 60],
+    "unacceptable_score": 0,
+    "unknown_position_score": null,
+    "unknown_action": "manual_review",
+    "auto_accept_threshold": 70,
+    "auto_reject_threshold": 0,
+    "escalation_triggers": ["unacceptable_match", "unknown", "missing_required_clause"]
+  },
+  "rules": [
+    {
+      "rule_id": "LOL-001",
+      "name": "Limitation of Liability Cap",
+      "category": "Risk Allocation",
+      "risk_level": "critical",
+      "optional": false,
+      "auto_negotiate": true,
+      "standard_position": {
+        "text": "Each party's aggregate liability shall not exceed the total fees paid or payable in the 12 months preceding the claim. This limitation shall not apply to: (a) gross negligence or willful misconduct; (b) indemnification obligations; (c) breach of confidentiality; (d) infringement of intellectual property rights.",
+        "score": 100
+      },
+      "acceptable_deviations": [
+        {
+          "id": "LOL-001-A1",
+          "text": "Liability capped at 24 months of fees paid",
+          "score": 90,
+          "notes": "Extended cap acceptable for high-value deals"
+        },
+        {
+          "id": "LOL-001-A2",
+          "text": "Liability capped at total contract value",
+          "score": 80,
+          "notes": "Common in fixed-price agreements"
+        },
+        {
+          "id": "LOL-001-A3",
+          "text": "Data breach carve-out up to 2x cap amount",
+          "score": 75,
+          "notes": "Acceptable given data breach exposure"
+        },
+        {
+          "id": "LOL-001-A4",
+          "text": "Mutual cap with identical terms for both parties",
+          "score": 70,
+          "notes": "Minimum acceptable if mutual"
+        }
+      ],
+      "unacceptable_deviations": [
+        {
+          "id": "LOL-001-U1",
+          "text": "Unlimited liability for either party",
+          "score": 0,
+          "action": "reject_and_escalate"
+        },
+        {
+          "id": "LOL-001-U2",
+          "text": "Cap below 6 months of fees",
+          "score": 0,
+          "action": "reject_and_counter"
+        },
+        {
+          "id": "LOL-001-U3",
+          "text": "No carve-out for gross negligence or willful misconduct",
+          "score": 0,
+          "action": "reject_and_counter"
+        },
+        {
+          "id": "LOL-001-U4",
+          "text": "Asymmetric cap favoring counterparty only",
+          "score": 0,
+          "action": "reject_and_escalate"
+        }
+      ],
+      "guidance": "LoL caps should reflect deal value and risk profile. Always preserve carve-outs for intentional conduct. Consider insurance coverage when negotiating cap amounts. Caps removing incentive to perform may be unenforceable under UCC 2-719.",
+      "legal_authority": [
+        {
+          "citation": "UCC Section 2-719(3)",
+          "jurisdiction": "US-General",
+          "holding": "Consequential damage limitations are valid unless unconscionable",
+          "relevance": "Foundation for LoL enforceability"
+        },
+        {
+          "citation": "Matter of Part 60 Put-Back Litig., 36 N.Y.3d 342 (2020)",
+          "jurisdiction": "US-NY",
+          "holding": "Limitation of liability clauses represent legitimate risk allocation and are enforceable unless gross negligence is excluded",
+          "relevance": "Supports enforceability of reasonable caps"
+        },
+        {
+          "citation": "Sommer v. Fed. Signal Corp., 79 N.Y.2d 540 (1992)",
+          "jurisdiction": "US-NY",
+          "holding": "Gross negligence requires conduct that smacks of intentional wrongdoing or reckless indifference",
+          "relevance": "Defines gross negligence carve-out threshold"
+        }
+      ],
+      "jurisdiction_variants": {
+        "US-NY": {
+          "rule": "Enforces unless gross negligence excluded; gross negligence must smack of intentional wrongdoing",
+          "enforceability_modifier": 1.0
+        },
+        "US-CA": {
+          "rule": "Sliding-scale unconscionability analysis; both procedural AND substantive required but inversely weighted",
+          "enforceability_modifier": 0.9
+        },
+        "US-PA": {
+          "rule": "13 Pa.C.S. Section 2719 - commercial LoL clauses presumptively valid",
+          "enforceability_modifier": 1.1
+        },
+        "US-IL": {
+          "rule": "Unenforceable if improvident, oppressive, or totally one-sided",
+          "enforceability_modifier": 0.85
+        },
+        "US-CO": {
+          "rule": "Cannot limit liability for willful and wanton breach",
+          "enforceability_modifier": 0.95
+        }
+      }
+    },
+    {
+      "rule_id": "TERM-001",
+      "name": "Termination Rights",
+      "category": "Term and Termination",
+      "risk_level": "high",
+      "optional": false,
+      "auto_negotiate": true,
+      "standard_position": {
+        "text": "Either party may terminate: (a) for material breach with 30 days written notice and opportunity to cure; (b) immediately upon insolvency, bankruptcy, or assignment for benefit of creditors. Customer may terminate for convenience with 60 days notice. Vendor may terminate for convenience with 90 days notice. Upon termination: fees earned are due, data is returned/destroyed, and survival clauses remain effective.",
+        "score": 100
+      },
+      "acceptable_deviations": [
+        {
+          "id": "TERM-001-A1",
+          "text": "15-day cure period for material breach",
+          "score": 90,
+          "notes": "Shorter cure acceptable for clear breaches"
+        },
+        {
+          "id": "TERM-001-A2",
+          "text": "Mutual 60-day termination for convenience",
+          "score": 85,
+          "notes": "Acceptable if mutual"
+        },
+        {
+          "id": "TERM-001-A3",
+          "text": "Termination for convenience with early termination fee",
+          "score": 75,
+          "notes": "Acceptable if fee is reasonable (e.g., 3 months fees)"
+        },
+        {
+          "id": "TERM-001-A4",
+          "text": "90-day notice for termination for convenience",
+          "score": 70,
+          "notes": "Extended notice acceptable for complex transitions"
+        }
+      ],
+      "unacceptable_deviations": [
+        {
+          "id": "TERM-001-U1",
+          "text": "No termination for convenience right",
+          "score": 0,
+          "action": "reject_and_counter"
+        },
+        {
+          "id": "TERM-001-U2",
+          "text": "Termination for convenience by counterparty only",
+          "score": 0,
+          "action": "reject_and_counter"
+        },
+        {
+          "id": "TERM-001-U3",
+          "text": "No cure period for material breach",
+          "score": 0,
+          "action": "reject_and_counter"
+        },
+        {
+          "id": "TERM-001-U4",
+          "text": "Termination penalty exceeding 12 months fees",
+          "score": 0,
+          "action": "reject_and_escalate"
+        }
+      ],
+      "guidance": "Ensure balanced termination rights. Always preserve cure periods for breach. Termination for convenience provides flexibility but may require reasonable notice or wind-down fees. Post-termination obligations (data return, survival clauses) are critical.",
+      "legal_authority": [
+        {
+          "citation": "Restatement (Second) of Contracts Section 241",
+          "jurisdiction": "US-General",
+          "holding": "Material breach is determined by examining significance of breach, likelihood of cure, adequacy of compensation, and hardship",
+          "relevance": "Defines material breach standard"
+        },
+        {
+          "citation": "K-Line Builders, Inc. v. First Fed. Sav. & Loan Ass'n, 677 S.W.2d 886 (Mo. 1984)",
+          "jurisdiction": "US-MO",
+          "holding": "Termination clauses allowing for cure are favored; immediate termination without cure may be unconscionable",
+          "relevance": "Supports cure period requirements"
+        }
+      ]
+    },
+    {
+      "rule_id": "DATA-001",
+      "name": "Data Protection and Privacy",
+      "category": "Data and Privacy",
+      "risk_level": "critical",
+      "optional": false,
+      "auto_negotiate": true,
+      "standard_position": {
+        "text": "Vendor shall process Customer Data only as instructed by Customer and in accordance with applicable data protection laws (including GDPR, CCPA). Vendor implements appropriate technical and organizational measures (encryption, access controls, audit logging). Vendor will notify Customer of data breaches within 72 hours. Upon termination, Vendor will return or securely delete Customer Data. Subprocessors require prior written approval.",
+        "score": 100
+      },
+      "acceptable_deviations": [
+        {
+          "id": "DATA-001-A1",
+          "text": "Breach notification within 48-96 hours",
+          "score": 90,
+          "notes": "Reasonable notification window"
+        },
+        {
+          "id": "DATA-001-A2",
+          "text": "Pre-approved list of subprocessors with notification of changes",
+          "score": 85,
+          "notes": "Acceptable with objection right"
+        },
+        {
+          "id": "DATA-001-A3",
+          "text": "Annual security audit with SOC 2 Type II report",
+          "score": 80,
+          "notes": "Industry standard certification"
+        },
+        {
+          "id": "DATA-001-A4",
+          "text": "Data retention for 30 days post-termination for transition",
+          "score": 75,
+          "notes": "Reasonable transition period"
+        }
+      ],
+      "unacceptable_deviations": [
+        {
+          "id": "DATA-001-U1",
+          "text": "Vendor may use Customer Data for own purposes",
+          "score": 0,
+          "action": "reject_and_escalate"
+        },
+        {
+          "id": "DATA-001-U2",
+          "text": "No breach notification obligation",
+          "score": 0,
+          "action": "reject_and_escalate"
+        },
+        {
+          "id": "DATA-001-U3",
+          "text": "Unlimited subprocessor engagement without notice",
+          "score": 0,
+          "action": "reject_and_counter"
+        },
+        {
+          "id": "DATA-001-U4",
+          "text": "No data deletion obligation upon termination",
+          "score": 0,
+          "action": "reject_and_counter"
+        }
+      ],
+      "guidance": "Data protection is regulatory-driven and non-negotiable in many respects. GDPR requires 72-hour breach notification. CCPA requires service provider restrictions. Always preserve audit rights, breach notification, and deletion obligations.",
+      "legal_authority": [
+        {
+          "citation": "GDPR Article 28",
+          "jurisdiction": "EU",
+          "holding": "Processors must provide sufficient guarantees, process only on documented instructions, and assist with compliance obligations",
+          "relevance": "EU data processing requirements"
+        },
+        {
+          "citation": "CCPA Cal. Civ. Code Section 1798.140(v)",
+          "jurisdiction": "US-CA",
+          "holding": "Service providers must not retain, use, or disclose personal information except as necessary to perform services",
+          "relevance": "California service provider restrictions"
+        },
+        {
+          "citation": "GDPR Article 33",
+          "jurisdiction": "EU",
+          "holding": "Personal data breaches must be notified to supervisory authority within 72 hours",
+          "relevance": "Breach notification timing requirement"
+        }
+      ]
+    }
+  ],
+  "decision_logic": {
+    "matching_algorithm": {
+      "method": "semantic_similarity",
+      "threshold": 0.75,
+      "fallback": "keyword_extraction",
+      "models_recommended": ["sentence-transformers", "legal-bert", "contract-bert"]
+    },
+    "scoring_workflow": [
+      {
+        "step": 1,
+        "action": "classify_clause",
+        "description": "Identify clause type using NLP classification",
+        "output": "rule_id"
+      },
+      {
+        "step": 2,
+        "action": "extract_key_terms",
+        "description": "Extract numerical values, durations, percentages, named entities",
+        "output": "extracted_terms"
+      },
+      {
+        "step": 3,
+        "action": "match_position",
+        "description": "Compare extracted terms against standard_position and deviations",
+        "output": "matched_position_id"
+      },
+      {
+        "step": 4,
+        "action": "apply_jurisdiction",
+        "description": "Apply jurisdiction-specific modifiers if applicable",
+        "output": "jurisdiction_modifier"
+      },
+      {
+        "step": 5,
+        "action": "calculate_score",
+        "description": "Compute final score: base_score x jurisdiction_modifier",
+        "output": "final_score"
+      },
+      {
+        "step": 6,
+        "action": "determine_action",
+        "description": "Route based on score thresholds and auto_negotiate flag",
+        "output": "recommended_action"
+      }
+    ]
+  },
+  "training_data_schema": {
+    "description": "Schema for labeled training examples to improve clause classification and position matching",
+    "example_format": {
+      "clause_text": "Vendor's total aggregate liability shall not exceed the fees paid in the preceding six (6) months.",
+      "rule_id": "LOL-001",
+      "matched_position": "unacceptable_deviation",
+      "matched_position_id": "LOL-001-U2",
+      "extracted_terms": {
+        "cap_amount": "6 months fees",
+        "cap_type": "aggregate",
+        "parties_covered": "vendor_only"
+      },
+      "expected_score": 0,
+      "expected_action": "reject_and_counter",
+      "jurisdiction": "US-General"
+    }
+  }
+}
